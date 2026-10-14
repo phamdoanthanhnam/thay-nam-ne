@@ -1,0 +1,104 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Thầy Nam Nè – Sửa câu văn</title><meta name="theme-color" content="#3a86ff"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--b:#3a86ff;--o:#ff9f1c;--g:#06d6a0;--r:#ef476f;--y:#ffd60a;--ink:#2b2d42;--bg:#fffaf0}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:17px}
+.wrap{max-width:520px;margin:auto;padding:0 14px 90px}
+header{background:linear-gradient(135deg,#3a86ff,#8338ec);color:#fff;padding:14px 16px 46px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+header h1{margin:0;font-size:26px}header p{margin:4px 0 0;opacity:.95;font-size:15px}
+header img{position:absolute;right:10px;top:8px;width:92px;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+.star{position:absolute;color:var(--y);font-size:14px}
+.badge{display:inline-block;margin-top:8px;background:#fff3;padding:3px 10px;border-radius:99px;font-size:13px}
+.badge.demo{background:var(--y);color:var(--ink);font-weight:700}
+.card{background:#fff;border-radius:20px;padding:14px;margin-top:14px;box-shadow:0 4px 0 #0000000d,0 2px 12px #0000000f}
+.lift{margin-top:-30px;position:relative}
+h2{font-size:19px;margin:0 0 10px;display:flex;gap:8px;align-items:center}
+.tabs{display:flex;gap:8px;margin-bottom:10px}.tabs button{flex:1;border:0;border-radius:14px;padding:12px;font-size:16px;font-weight:700;background:#eef4ff;color:var(--b)}
+.tabs button.on{background:var(--b);color:#fff}
+select,textarea{width:100%;font:inherit;border:2px solid #dbe6ff;border-radius:14px;padding:10px}textarea{min-height:140px;line-height:1.5;resize:vertical}
+textarea:focus,select:focus{outline:none;border-color:var(--b)}
+.row{display:flex;gap:8px;margin-bottom:8px}.row select{flex:1}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font-size:19px;font-weight:800;color:#fff;background:linear-gradient(90deg,#ff9f1c,#ff6b35);box-shadow:0 5px 0 #c94f1e;margin-top:10px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #c94f1e}.btn:disabled{opacity:.5}
+.btn.sec{background:#eef4ff;color:var(--b);box-shadow:0 4px 0 #c9d8ff;font-size:16px;padding:12px}
+.drop{border:3px dashed #c9d8ff;border-radius:16px;padding:18px;text-align:center;color:#5c6b8a}
+.drop img{max-width:100%;max-height:220px;border-radius:10px}
+.muted{color:#6b7280;font-size:14px}.count{text-align:right;font-size:13px;color:#6b7280;margin-top:4px}
+.stat{display:inline-block;background:#e9fff7;color:#05866a;border-radius:99px;padding:5px 12px;font-weight:700;font-size:14px}
+.cmp{display:grid;gap:8px}.cmp div{border-radius:14px;padding:10px;line-height:1.6}.orig{background:#f5f5f5}.fix{background:#eafff6;border:2px solid var(--g)}
+.lbl{font-size:12px;font-weight:800;text-transform:uppercase;color:#888;display:block}
+ins{background:#b8f5d9;text-decoration:none;border-radius:4px;padding:0 2px;font-weight:700}del{background:#ffd6dd;color:#b3003c;border-radius:4px;padding:0 2px}
+.weak{border-left:6px solid var(--o);background:#fff7e8;border-radius:12px;padding:10px;margin-bottom:8px}.weak b{display:block}
+.praise{background:#fff0f6;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}.praise img{width:52px}
+.rule{background:#eef4ff;border-radius:12px;padding:8px 10px;font-size:14px;margin-top:8px}
+video{width:100%;border-radius:14px;background:#000}ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0 0}
+ol.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}ol.steps li:before{content:counter(s);background:var(--o);color:#fff;font-weight:800;min-width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+#net{position:fixed;left:0;right:0;top:0;background:var(--r);color:#fff;text-align:center;padding:10px;font-weight:700;z-index:9;display:none}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid #fff8;border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite;vertical-align:-3px}@keyframes sp{to{transform:rotate(360deg)}}
+.hide{display:none}details summary{font-weight:700;cursor:pointer}
+footer{text-align:center;font-size:13px;color:#999;margin-top:20px}
+</style></head><body>
+<div id="net">📡 Mất mạng rồi! Con kết nối Internet để thầy Nam sửa bài nhé.</div>
+<header><span class="star" style="left:60%;top:10px">★</span><span class="star" style="left:52%;top:60px">✦</span>
+<h1>Thầy Nam Nè</h1><p>Cùng thầy sửa câu văn cho hay hơn ✏️</p><span id="mode" class="badge">Đang kiểm tra…</span>
+<img src="/mascot.svg" alt="Linh vật cú Nam Nè"></header>
+<div class="wrap">
+<section class="card lift" id="write">
+  <div class="tabs"><button id="tType" class="on">⌨️ Gõ bài</button><button id="tPhoto">📷 Chụp bài</button></div>
+  <div class="row"><select id="genre" aria-label="Thể loại"><option value="tudo">📝 Câu văn tự do</option><option value="ke">📖 Kể chuyện</option><option value="ta">🐱 Văn tả</option><option value="camnghi">💖 Nêu cảm nghĩ</option><option value="thu">✉️ Viết thư</option></select>
+  <select id="grade" aria-label="Lớp" style="flex:.55"><option value="1">Lớp 1</option><option value="2">Lớp 2</option><option value="3" selected>Lớp 3</option><option value="4">Lớp 4</option><option value="5">Lớp 5</option></select></div>
+  <div id="photoBox" class="hide">
+    <label class="drop" id="drop"><input id="file" type="file" accept="image/*" capture="environment" hidden><span id="dropTxt">📸 Bấm để chụp hoặc chọn ảnh bài viết</span><img id="prev" class="hide" alt="Ảnh bài viết"></label>
+    <button class="btn sec" id="ocrBtn" disabled>🔍 Đọc chữ trong ảnh</button>
+    <p class="muted" id="ocrMsg">Thầy đọc xong, con xem lại chữ trong ô bên dưới, sửa chỗ đọc sai rồi mới bấm “Sửa bài”.</p>
+  </div>
+  <textarea id="txt" maxlength="1500" placeholder="Con gõ câu văn hoặc đoạn văn vào đây nhé… Ví dụ: con mèo nhà em rất đẹp con mèo có bộ lông màu vàng"></textarea>
+  <div class="count" id="cnt">0 câu · 0 chữ</div>
+  <button class="btn" id="fixBtn">✨ Sửa bài cho con</button>
+  <div class="rule">🌱 <b>Nguyên tắc của thầy:</b> giữ đúng số câu con viết, dùng lại chữ của con, chỉ thêm thật ít từ và sửa dấu câu, chính tả.</div>
+</section>
+<section class="card hide" id="result">
+  <h2>🌟 Câu văn đã sửa</h2><span class="stat" id="stat"></span>
+  <div class="cmp" style="margin-top:10px"><div class="orig"><span class="lbl">Bài của con</span><span id="o"></span></div><div class="fix"><span class="lbl">Thầy sửa (chữ xanh là chỗ thêm/sửa)</span><span id="f"></span></div></div>
+  <button class="btn sec" id="copy">📋 Chép câu đã sửa</button>
+</section>
+<section class="card hide" id="weakCard"><h2>🔎 Chỗ con cần chú ý</h2><div id="weak"></div><div class="praise"><img src="/mascot.svg" alt=""><div id="praise"></div></div></section>
+<section class="card" id="guide"><h2>🎬 Hướng dẫn cho con</h2>
+  <video controls playsinline preload="metadata" poster="/guide-poster.png" src="/guide.mp4"></video>
+  <ol class="steps"><li>Chọn <b>thể loại</b> bài (kể, tả, cảm nghĩ…) và lớp của con.</li><li><b>Gõ bài</b> vào ô trắng, hoặc bấm <b>Chụp bài</b> để chụp trang vở rồi bấm “Đọc chữ trong ảnh”.</li><li>Xem lại chữ, sửa chỗ thầy đọc nhầm. Xong bấm <b>✨ Sửa bài cho con</b>.</li><li>Xem <b>chữ xanh</b> là chỗ thầy sửa, đọc thẻ <b>Chỗ con cần chú ý</b> rồi tự chép lại vào vở nhé!</li></ol>
+  <details><summary>📲 Thêm vào màn hình điện thoại</summary><p class="muted">iPhone: mở bằng Safari → nút Chia sẻ → “Thêm vào MH chính”. Android: Chrome → ⋮ → “Thêm vào màn hình chính”. Không cần cửa hàng ứng dụng, miễn phí.</p></details>
+</section>
+<footer>Thầy Nam Nè · Lớp 3/1 · Cần mạng Internet để dùng AI</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id); let MODE='demo', imgData=null;
+const sents=t=>(t.trim().match(/[^.!?…]+[.!?…]*/g)||[]).filter(s=>/[\p{L}\p{N}]/u.test(s)).length, words=t=>(t.trim().match(/[\p{L}\p{N}]+/gu)||[]).length;
+$('txt').oninput=()=>$('cnt').textContent=`${sents($('txt').value)} câu · ${words($('txt').value)} chữ`;
+fetch('/api/health').then(r=>r.json()).then(j=>{MODE=j.mode; const m=$('mode'); if(j.mode==='demo'){m.textContent='⚠️ Chế độ thử – chưa có AI, chỉ sửa viết hoa, dấu câu';m.classList.add('demo')} else m.textContent='🤖 Đang dùng AI ('+j.mode+')';}).catch(()=>$('mode').textContent='Chưa kết nối máy chủ');
+function net(){$('net').style.display=navigator.onLine?'none':'block'} addEventListener('online',net);addEventListener('offline',net);net();
+$('tType').onclick=()=>{$('tType').classList.add('on');$('tPhoto').classList.remove('on');$('photoBox').classList.add('hide')};
+$('tPhoto').onclick=()=>{$('tPhoto').classList.add('on');$('tType').classList.remove('on');$('photoBox').classList.remove('hide')};
+$('file').onchange=e=>{const f=e.target.files[0]; if(!f)return; const img=new Image(); img.onload=()=>{const s=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;c.getContext('2d').drawImage(img,0,0,c.width,c.height);const u=c.toDataURL('image/jpeg',.85);imgData=u.split(',')[1];$('prev').src=u;$('prev').classList.remove('hide');$('dropTxt').classList.add('hide');$('ocrBtn').disabled=false}; img.src=URL.createObjectURL(f)};
+function loadTess(){return new Promise((ok,no)=>{if(window.Tesseract)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+$('ocrBtn').onclick=async()=>{if(!navigator.onLine)return net(); const b=$('ocrBtn');b.disabled=true;b.innerHTML='<span class="spin" style="border-color:#3a86ff55;border-top-color:#3a86ff"></span> Thầy đang đọc chữ…';
+  try{let text=null; if(MODE!=='demo'){const r=await fetch('/api/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mime:'image/jpeg',data:imgData})});const j=await r.json();text=j.text}
+    if(!text){$('ocrMsg').textContent='Đang đọc bằng công cụ trong máy (Tesseract, lần đầu hơi lâu)…';await loadTess();const r=await Tesseract.recognize('data:image/jpeg;base64,'+imgData,'vie');text=r.data.text}
+    $('txt').value=text.replace(/\n+/g,' ').trim();$('txt').oninput();$('ocrMsg').textContent='✅ Thầy đọc xong! Con kiểm tra và sửa chữ đọc sai trong ô dưới, rồi bấm “Sửa bài cho con”.';$('txt').focus();
+  }catch(e){$('ocrMsg').textContent='😢 Thầy chưa đọc được ảnh. Con chụp rõ hơn hoặc gõ bài nhé.'}
+  b.disabled=false;b.textContent='🔍 Đọc chữ trong ảnh'};
+function diff(a,b){const A=a.split(/\s+/).filter(Boolean),B=b.split(/\s+/).filter(Boolean),n=A.length,m=B.length,L=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  const oa=[],ob=[];let i=0,j=0;const e=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  while(i<n&&j<m){if(A[i]===B[j]){oa.push(e(A[i]));ob.push(e(B[j]));i++;j++}else if(L[i+1][j]>=L[i][j+1]){oa.push('<del>'+e(A[i++])+'</del>')}else ob.push('<ins>'+e(B[j++])+'</ins>')}
+  while(i<n)oa.push('<del>'+e(A[i++])+'</del>');while(j<m)ob.push('<ins>'+e(B[j++])+'</ins>');return[oa.join(' '),ob.join(' ')]}
+$('fixBtn').onclick=async()=>{const text=$('txt').value.trim(); if(!text){$('txt').focus();return} if(!navigator.onLine)return net();
+  const b=$('fixBtn');b.disabled=true;b.innerHTML='<span class="spin"></span> Thầy đang sửa…';
+  try{const r=await fetch('/api/fix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,genre:$('genre').value,grade:$('grade').value})});const j=await r.json(); if(!r.ok)throw new Error(j.error);
+    const [o,f]=diff(text,j.fixed);$('o').innerHTML=o;$('f').innerHTML=f;$('stat').textContent=`${j.sentencesIn} câu → ${j.sentencesOut} câu · ${j.wordsIn} chữ → ${j.wordsOut} chữ`+(j.mode==='demo'?' · Chế độ thử':'');
+    $('weak').innerHTML=(j.weaknesses.length?j.weaknesses:[{title:'Tuyệt vời!',detail:'Thầy chưa thấy lỗi nào lớn.'}]).map(w=>`<div class="weak"><b>⚠️ ${w.title}</b>${w.detail}</div>`).join('');$('praise').textContent=j.praise;
+    $('result').classList.remove('hide');$('weakCard').classList.remove('hide');$('result').scrollIntoView({behavior:'smooth'});$('copy').onclick=()=>navigator.clipboard?.writeText(j.fixed);
+  }catch(e){alert(navigator.onLine?'Có lỗi: '+e.message:'Mất mạng rồi con ơi!')}
+  b.disabled=false;b.textContent='✨ Sửa bài cho con'};
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');
+</script></body></html>
