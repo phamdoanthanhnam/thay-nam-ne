@@ -3,6 +3,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const PORT = process.env.PORT || 8787;
 const GEMINI = process.env.GEMINI_API_KEY, OPENAI = process.env.OPENAI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+const AI_TIMEOUT = +process.env.AI_TIMEOUT_MS || 25000;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const MODE = GEMINI ? 'gemini' : OPENAI ? 'openai' : 'demo';
 const PUB = path.join(__dirname, 'public');
@@ -33,12 +34,12 @@ BÀI CỦA BÉ:
 async function callAI(p, image){
   if (MODE === 'gemini'){
     const parts = [{ text: p }]; if (image) parts.push({ inline_data: { mime_type: image.mime, data: image.data } });
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{ temperature:0.2, responseMimeType: image ? 'text/plain' : 'application/json' } }) });
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI}`, { method:'POST', signal: AbortSignal.timeout(AI_TIMEOUT), headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{ temperature:0.2, responseMimeType: image ? 'text/plain' : 'application/json' } }) });
     const j = await r.json(); if (!r.ok) throw new Error(j.error?.message || 'Gemini lỗi');
     return j.candidates?.[0]?.content?.parts?.map(x=>x.text).join('') || '';
   }
   const content = image ? [{type:'text',text:p},{type:'image_url',image_url:{url:`data:${image.mime};base64,${image.data}`}}] : p;
-  const r = await fetch('https://api.openai.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${OPENAI}`}, body: JSON.stringify({ model: OPENAI_MODEL, temperature:0.2, messages:[{role:'user',content}], ...(image?{}:{response_format:{type:'json_object'}}) }) });
+  const r = await fetch('https://api.openai.com/v1/chat/completions', { method:'POST', signal: AbortSignal.timeout(AI_TIMEOUT), headers:{'Content-Type':'application/json', Authorization:`Bearer ${OPENAI}`}, body: JSON.stringify({ model: OPENAI_MODEL, temperature:0.2, messages:[{role:'user',content}], ...(image?{}:{response_format:{type:'json_object'}}) }) });
   const j = await r.json(); if (!r.ok) throw new Error(j.error?.message || 'OpenAI lỗi');
   return j.choices[0].message.content;
 }
@@ -76,13 +77,13 @@ async function ocr(image){
   return { mode: MODE, text: t.trim() };
 }
 
-function body(req){ return new Promise((res,rej)=>{ let d=''; req.on('data',c=>{ d+=c; if(d.length>8e6){ req.destroy(); rej(new Error('quá lớn')); } }); req.on('end',()=>{ try{ res(JSON.parse(d||'{}')); }catch(e){ rej(e); } }); }); }
+function body(req){ if (req.body !== undefined) return Promise.resolve(typeof req.body==='string' ? JSON.parse(req.body||'{}') : (req.body||{})); return new Promise((res,rej)=>{ let d=''; req.on('data',c=>{ d+=c; if(d.length>8e6){ req.destroy(); rej(new Error('quá lớn')); } }); req.on('end',()=>{ try{ res(JSON.parse(d||'{}')); }catch(e){ rej(e); } }); }); }
 function send(res, code, obj){ res.writeHead(code, {'Content-Type':'application/json; charset=utf-8'}); res.end(JSON.stringify(obj)); }
 
 const HITS = new Map(); // giới hạn 10 lượt AI / phút / IP
-function limited(req){ const ip=(req.headers['cf-connecting-ip']||req.headers['x-forwarded-for']||req.socket.remoteAddress||'').split(',')[0].trim(); const now=Date.now();
+function limited(req){ const ip=(req.headers['cf-connecting-ip']||req.headers['x-forwarded-for']||req.socket?.remoteAddress||'').split(',')[0].trim(); const now=Date.now();
   const a=(HITS.get(ip)||[]).filter(t=>now-t<60000); if(a.length>=10){ HITS.set(ip,a); return true; } a.push(now); HITS.set(ip,a); return false; }
-http.createServer(async (req,res)=>{
+async function handle(req,res){
   try {
     if (req.method==='POST' && req.url.startsWith('/api/') && limited(req)) return send(res,429,{error:'Con bấm nhanh quá! Nghỉ 1 phút rồi thử lại nhé.'});
     if (req.url === '/api/health') return send(res,200,{ok:true, mode:MODE});
@@ -98,5 +99,7 @@ http.createServer(async (req,res)=>{
       if (range){ const [s,e2]=range.replace('bytes=','').split('-'); const start=+s, end=e2?+e2:st.size-1;
         res.writeHead(206,{'Content-Type':type,'Content-Range':`bytes ${start}-${end}/${st.size}`,'Accept-Ranges':'bytes','Content-Length':end-start+1}); return fs.createReadStream(f,{start,end}).pipe(res); }
       res.writeHead(200,{'Content-Type':type,'Content-Length':st.size,'Accept-Ranges':'bytes'}); fs.createReadStream(f).pipe(res); });
-  } catch(e){ send(res,500,{error:'Có lỗi: '+e.message}); }
-}).listen(PORT, ()=>console.log(`Thầy Nam Nè chạy tại http://localhost:${PORT} – chế độ: ${MODE}`));
+  } catch(e){ const msg = (e.name==='TimeoutError'||e.name==='AbortError') ? 'Máy sửa bài đang chậm, con thử lại sau ít phút nhé.' : 'Có lỗi: '+e.message; send(res, e.name==='TimeoutError'?504:500, {error:msg}); }
+}
+module.exports = { handle };
+if (require.main === module) http.createServer(handle).listen(PORT, ()=>console.log(`Thầy Nam Nè chạy tại http://localhost:${PORT} – chế độ: ${MODE}`));
