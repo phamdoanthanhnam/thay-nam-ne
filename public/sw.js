@@ -1,4 +1,4 @@
-const C='tnn-v1', SHELL=['/','/index.html','/mascot.svg','/manifest.webmanifest','/icon-192.png'];
+const C='tnn-v2', SHELL=['/','/index.html','/teacher.webp','/manifest.webmanifest','/icon-192.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(SHELL))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x))))));
 self.addEventListener('fetch',e=>{ const u=new URL(e.request.url); if(u.pathname.startsWith('/api/')||e.request.method!=='GET'||u.pathname.endsWith('.mp4')) return;

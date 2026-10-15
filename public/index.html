@@ -1,12 +1,12 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Thầy Nam Nè – Sửa câu văn</title><meta name="theme-color" content="#3a86ff"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Thầy Nam Nè – Sửa câu văn</title><meta name="theme-color" content="#3a86ff"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 :root{--b:#3a86ff;--o:#ff9f1c;--g:#06d6a0;--r:#ef476f;--y:#ffd60a;--ink:#2b2d42;--bg:#fffaf0}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:17px}
 .wrap{max-width:520px;margin:auto;padding:0 14px 90px}
 header{background:linear-gradient(135deg,#3a86ff,#8338ec);color:#fff;padding:14px 16px 46px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 header h1{margin:0;font-size:26px}header p{margin:4px 0 0;opacity:.95;font-size:15px}
-header img{position:absolute;right:10px;top:8px;width:92px;animation:bob 3s ease-in-out infinite}
+header img{position:absolute;right:10px;top:8px;width:88px;height:88px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,.25);animation:bob 3s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
 .star{position:absolute;color:var(--y);font-size:14px}
 .badge{display:inline-block;margin-top:8px;background:#fff3;padding:3px 10px;border-radius:99px;font-size:13px}
@@ -30,7 +30,7 @@ textarea:focus,select:focus{outline:none;border-color:var(--b)}
 .lbl{font-size:12px;font-weight:800;text-transform:uppercase;color:#888;display:block}
 ins{background:#b8f5d9;text-decoration:none;border-radius:4px;padding:0 2px;font-weight:700}del{background:#ffd6dd;color:#b3003c;border-radius:4px;padding:0 2px}
 .weak{border-left:6px solid var(--o);background:#fff7e8;border-radius:12px;padding:10px;margin-bottom:8px}.weak b{display:block}
-.praise{background:#fff0f6;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}.praise img{width:52px}
+.praise{background:#fff0f6;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}.praise img{width:52px;height:52px;border-radius:50%;flex:none}
 .rule{background:#eef4ff;border-radius:12px;padding:8px 10px;font-size:14px;margin-top:8px}
 video{width:100%;border-radius:14px;background:#000}ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:10px 0 0}
 ol.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}ol.steps li:before{content:counter(s);background:var(--o);color:#fff;font-weight:800;min-width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
@@ -42,7 +42,7 @@ footer{text-align:center;font-size:13px;color:#999;margin-top:20px}
 <div id="net">📡 Mất mạng rồi! Con kết nối Internet để thầy Nam sửa bài nhé.</div>
 <header><span class="star" style="left:60%;top:10px">★</span><span class="star" style="left:52%;top:60px">✦</span>
 <h1>Thầy Nam Nè</h1><p>Cùng thầy sửa câu văn cho hay hơn ✏️</p><span id="mode" class="badge">Đang kiểm tra…</span>
-<img src="/mascot.svg" alt="Linh vật cú Nam Nè"></header>
+<img src="/teacher.webp" alt="Thầy Nam" class="face"></header>
 <div class="wrap">
 <section class="card lift" id="write">
   <div class="tabs"><button id="tType" class="on">⌨️ Gõ bài</button><button id="tPhoto">📷 Chụp bài</button></div>
@@ -63,7 +63,7 @@ footer{text-align:center;font-size:13px;color:#999;margin-top:20px}
   <div class="cmp" style="margin-top:10px"><div class="orig"><span class="lbl">Bài của con</span><span id="o"></span></div><div class="fix"><span class="lbl">Thầy sửa (chữ xanh là chỗ thêm/sửa)</span><span id="f"></span></div></div>
   <button class="btn sec" id="copy">📋 Chép câu đã sửa</button>
 </section>
-<section class="card hide" id="weakCard"><h2>🔎 Chỗ con cần chú ý</h2><div id="weak"></div><div class="praise"><img src="/mascot.svg" alt=""><div id="praise"></div></div></section>
+<section class="card hide" id="weakCard"><h2>🔎 Chỗ con cần chú ý</h2><div id="weak"></div><div class="praise"><img src="/teacher.webp" alt="Thầy Nam" class="face"><div id="praise"></div></div></section>
 <section class="card" id="guide"><h2>🎬 Hướng dẫn cho con</h2>
   <video controls playsinline preload="metadata" poster="/guide-poster.png" src="/guide.mp4"></video>
   <ol class="steps"><li>Chọn <b>thể loại</b> bài (kể, tả, cảm nghĩ…) và lớp của con.</li><li><b>Gõ bài</b> vào ô trắng, hoặc bấm <b>Chụp bài</b> để chụp trang vở rồi bấm “Đọc chữ trong ảnh”.</li><li>Xem lại chữ, sửa chỗ thầy đọc nhầm. Xong bấm <b>✨ Sửa bài cho con</b>.</li><li>Xem <b>chữ xanh</b> là chỗ thầy sửa, đọc thẻ <b>Chỗ con cần chú ý</b> rồi tự chép lại vào vở nhé!</li></ol>

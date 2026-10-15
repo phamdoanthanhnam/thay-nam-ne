@@ -2,12 +2,12 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const PORT = process.env.PORT || 8787;
 const GEMINI = process.env.GEMINI_API_KEY, OPENAI = process.env.OPENAI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+const GEMINI_MODELS = [...new Set([process.env.GEMINI_MODEL || 'gemini-flash-latest', ...(process.env.GEMINI_FALLBACK || 'gemini-2.5-flash,gemini-flash-lite-latest').split(',')].map(x=>x.trim()).filter(Boolean))];
 const AI_TIMEOUT = +process.env.AI_TIMEOUT_MS || 25000;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const MODE = GEMINI ? 'gemini' : OPENAI ? 'openai' : 'demo';
 const PUB = path.join(__dirname, 'public');
-const TYPES = { '.html':'text/html; charset=utf-8', '.js':'text/javascript', '.css':'text/css', '.svg':'image/svg+xml', '.png':'image/png', '.mp4':'video/mp4', '.json':'application/json', '.webmanifest':'application/manifest+json', '.vtt':'text/vtt' };
+const TYPES = { '.html':'text/html; charset=utf-8', '.js':'text/javascript', '.css':'text/css', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.jpg':'image/jpeg', '.mp4':'video/mp4', '.json':'application/json', '.webmanifest':'application/manifest+json', '.vtt':'text/vtt' };
 
 const GENRES = { ke:'Kể chuyện', ta:'Tả (đồ vật, con vật, cây cối, người)', camnghi:'Nêu cảm nghĩ / tình cảm', thu:'Viết thư / tin nhắn', tudo:'Câu văn tự do' };
 function splitSentences(t){ return (t.trim().match(/[^.!?…]+[.!?…]*/g)||[]).map(s=>s.trim()).filter(s=>/[\p{L}\p{N}]/u.test(s)); }
@@ -16,27 +16,35 @@ function countWords(t){ return (t.trim().match(/[\p{L}\p{N}]+/gu)||[]).length; }
 function check(orig, fixed, expectSentences){
   const s2 = splitSentences(fixed).length, w1 = countWords(orig), w2 = countWords(fixed);
   const okS = expectSentences ? s2 === expectSentences : true;
-  const okW = w1 === 0 ? true : Math.abs(w2 - w1) / w1 <= 0.2;
-  return { ok: okS && okW, s2, w1, w2 };
+  const add = w2 - w1, maxAdd = Math.max(3, Math.ceil(w1 * 0.25));
+  const okW = w1 === 0 ? true : (add >= -Math.ceil(w1 * 0.1) && add <= maxAdd);
+  return { ok: okS && okW, okS, s2, w1, w2 };
 }
 function prompt(text, genre, grade, strictNote){
   return `Bạn là thầy giáo tiểu học Việt Nam đang giúp học sinh lớp ${grade} sửa bài viết. Thể loại: ${GENRES[genre]||GENRES.tudo}.
 QUY TẮC BẮT BUỘC:
 1. Giữ ĐÚNG số câu ý của bé (nếu bé viết liền không chấm câu thì tách theo từng ý bé viết, không gộp, không thêm câu mới).
-2. Số chữ gần như giữ nguyên (lệch không quá 15%). DÙNG LẠI TỪ CỦA BÉ. Chỉ thêm rất ít từ nối (và, nên, nó, rất...) khi thật cần cho mạch lạc. Không thay bằng từ hoa mỹ, không viết lại dài dòng.
-3. Sửa chính tả, viết hoa đầu câu và tên riêng, dấu câu (chấm, phẩy, chấm than, chấm hỏi) cho đúng.
-4. Nếu câu đã đúng thì giữ nguyên.
+2. DÙNG LẠI TỪ CỦA BÉ, giữ ý của bé. ĐƯỢC thêm vài chữ (khoảng 1–3 từ mỗi câu, TỔNG số chữ thêm không quá 20% số chữ của bé) để câu hay hơn, giàu hình ảnh hơn, phù hợp học sinh lớp 3: ví dụ thêm từ chỉ màu sắc, âm thanh, cảm xúc, từ so sánh, từ láy (lá xanh mướt, chim hót líu lo, ve kêu râm ran, vui ơi là vui, tròn như quả cam...). Chữ thêm phải tự nhiên, đúng nghĩa, đúng ngữ pháp tiếng Việt (không viết "thật rất", không ghép từ thừa). KHÔNG xóa hay đổi chữ đúng của bé (bé viết "rất" thì giữ "rất"). Không thay bằng từ hoa mỹ khó hiểu, không viết lại câu, KHÔNG thêm câu mới.
+3. Giữ nguyên cách xưng hô trong bài của bé (bé viết "em" thì giữ "em", KHÔNG đổi thành "con").
+4. Sửa chính tả, viết hoa đầu câu và tên riêng, dấu câu (chấm, phẩy, chấm than, chấm hỏi) cho đúng.
+5. Câu đã đúng vẫn có thể thêm 1–2 từ cho hay hơn, nhưng giữ nguyên các chữ của bé.
 ${strictNote||''}
-Trả về CHỈ JSON: {"sentenceCount": số câu, "fixed": "đoạn đã sửa", "weaknesses": [{"title":"tên lỗi ngắn","detail":"giải thích dễ hiểu cho bé, có ví dụ từ bài"}], "praise": "một lời khen cụ thể, ấm áp"}. Tối đa 4 điểm yếu. Xưng "con", giọng thầy hiền.
+Trả về CHỈ JSON: {"sentenceCount": số câu, "fixed": "đoạn đã sửa", "weaknesses": [{"title":"tên lỗi ngắn","detail":"giải thích dễ hiểu cho bé, có ví dụ từ bài"}], "praise": "một lời khen cụ thể, ấm áp"}. Tối đa 4 điểm yếu. Riêng trong weaknesses và praise (không phải trong "fixed") thì thầy gọi bé là "con", giọng thầy hiền.
 BÀI CỦA BÉ:
 """${text}"""`;
 }
 async function callAI(p, image){
   if (MODE === 'gemini'){
     const parts = [{ text: p }]; if (image) parts.push({ inline_data: { mime_type: image.mime, data: image.data } });
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI}`, { method:'POST', signal: AbortSignal.timeout(AI_TIMEOUT), headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{ temperature:0.2, responseMimeType: image ? 'text/plain' : 'application/json' } }) });
-    const j = await r.json(); if (!r.ok) throw new Error(j.error?.message || 'Gemini lỗi');
-    return j.candidates?.[0]?.content?.parts?.map(x=>x.text).join('') || '';
+    let lastErr;
+    for (const model of GEMINI_MODELS){ // hết lượt miễn phí / quá tải thì thử model dự phòng
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI}`, { method:'POST', signal: AbortSignal.timeout(AI_TIMEOUT), headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{ temperature:0.3, responseMimeType: image ? 'text/plain' : 'application/json' } }) });
+      const j = await r.json();
+      if (r.ok) return j.candidates?.[0]?.content?.parts?.map(x=>x.text).join('') || '';
+      lastErr = new Error(r.status===429 ? 'Hôm nay thầy sửa nhiều bài quá rồi, con thử lại sau nhé.' : (j.error?.message || 'Gemini lỗi'));
+      if (![429,500,503,404].includes(r.status)) break;
+    }
+    throw lastErr;
   }
   const content = image ? [{type:'text',text:p},{type:'image_url',image_url:{url:`data:${image.mime};base64,${image.data}`}}] : p;
   const r = await fetch('https://api.openai.com/v1/chat/completions', { method:'POST', signal: AbortSignal.timeout(AI_TIMEOUT), headers:{'Content-Type':'application/json', Authorization:`Bearer ${OPENAI}`}, body: JSON.stringify({ model: OPENAI_MODEL, temperature:0.2, messages:[{role:'user',content}], ...(image?{}:{response_format:{type:'json_object'}}) }) });
@@ -64,8 +72,8 @@ async function fix(text, genre, grade){
   const exp = /[.!?…]/.test(text) ? origCount : (out.sentenceCount||null);
   let c = check(text, out.fixed||'', exp);
   if (!c.ok){ retried = true;
-    const note = `LẦN TRƯỚC BẠN SAI: bài sửa có ${c.s2} câu và ${c.w2} chữ, trong khi bài gốc ${exp?`có ${exp} câu và `:''}${c.w1} chữ. Hãy sửa lại sát bài gốc hơn.`;
-    try { const o2 = parseJSON(await callAI(prompt(text, genre, grade, note))); const c2 = check(text, o2.fixed||'', exp); if (c2.ok || Math.abs(c2.w2-c2.w1) < Math.abs(c.w2-c.w1)) out = o2; } catch(e){}
+    const note = `LẦN TRƯỚC BẠN SAI: bài sửa có ${c.s2} câu và ${c.w2} chữ, trong khi bài gốc ${exp?`có ${exp} câu và `:''}${c.w1} chữ. Bắt buộc đúng số câu gốc; chỉ được thêm tối đa ${Math.max(3,Math.ceil(c.w1*0.2))} chữ so với bài gốc.`;
+    try { const o2 = parseJSON(await callAI(prompt(text, genre, grade, note))); const c2 = check(text, o2.fixed||'', exp); if (c2.ok || (!c.okS && c2.okS) || (c2.okS === c.okS && Math.abs(c2.w2-c2.w1) < Math.abs(c.w2-c.w1))) out = o2; } catch(e){}
   }
   return { fixed: out.fixed, weaknesses: (out.weaknesses||[]).slice(0,4), praise: out.praise||'', mode: MODE, retried, ...stats(text, out.fixed, exp) };
 }
